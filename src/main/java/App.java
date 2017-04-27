@@ -8,6 +8,7 @@ import static spark.Spark.*;
 
 public class App {
   public static void main(String[] args) {
+    port(getHerokuAssignedPort());
     staticFileLocation("/public");
     String layout = "templates/layout.vtl";
 
@@ -34,15 +35,12 @@ public class App {
     model.put("template", "templates/success.vtl");
     return new ModelAndView(model, layout);
   }, new VelocityTemplateEngine());
-  ProcessBuilder process = new ProcessBuilder();
- Integer port;
- if (process.environment().get("PORT") != null) {
-     port = Integer.parseInt(process.environment().get("PORT"));
- } else {
-     port = 4567;
- }
-
-setPort(port);
 }
-
-}
+  static int getHerokuAssignedPort() {
+          ProcessBuilder processBuilder = new ProcessBuilder();
+          if (processBuilder.environment().get("PORT") != null) {
+              return Integer.parseInt(processBuilder.environment().get("PORT"));
+          }
+          return 4567; //return default port if heroku-port isn't set (i.e. on localhost)
+      }
+    }
